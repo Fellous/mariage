@@ -13,7 +13,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace mariage
+using System.Windows;
+
+namespace Mariage
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -24,5 +26,7 @@ namespace mariage
         {
             InitializeComponent();
         }
+
+        // Vous pouvez ajouter d'autres méthodes et événements ici si nécessaire
     }
 }
