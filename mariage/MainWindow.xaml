@@ -22,14 +22,24 @@
             <Setter Property="Padding" Value="10 5" />
             <Setter Property="Margin" Value="5" />
             <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Opacity="0.5" ShadowDepth="5" Color="Black"/>
+                </Setter.Value>
+            </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="{StaticResource AccentColor}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
-    </Window.Resources>
+        <ImageBrush x:Key="BackgroundImageBrush" ImageSource="file:///C:/Users/fello/OneDrive/Bureau/M1/.net/mariage/mariage/images/mariage.jpg"/>
 
+    </Window.Resources>
+    <Window.Background>
+        <StaticResource ResourceKey="BackgroundImageBrush"/>
+        
+    </Window.Background>
 
     <!-- Triggers pour l'animation du titre -->
     <Window.Triggers>
@@ -58,6 +68,7 @@
                    Text="Planification de Mariage" 
                    FontSize="28" 
                    FontWeight="Bold" 
+                   FontFamily="Segoe UI Light" 
                    Foreground="{StaticResource PrimaryColor}" 
                    HorizontalAlignment="Center" 
                    Margin="10">
@@ -67,7 +78,18 @@
         </TextBlock>
         
         <!-- Navigation -->
-        <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center" >
+        <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center">
+            <StackPanel.Triggers>
+                <EventTrigger RoutedEvent="StackPanel.Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:2"/>
+                            <ThicknessAnimation Storyboard.TargetProperty="Margin" From="0,30,0,-30" To="0" Duration="0:0:2"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </StackPanel.Triggers>
+
             <Button Content="Mariages" Width="150" Command="{Binding NavigateToMariagesCommand}"/>
             <Button Content="Invités" Width="150" Command="{Binding NavigateToInvitésCommand}"/>
             <Button Content="Tables" Width="150" Command="{Binding NavigateToTablesCommand}"/>
