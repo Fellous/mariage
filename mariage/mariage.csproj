@@ -8,8 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="ViewModels\" />
-      <Folder Include="Views\" />
+      <None Remove="images\mariage.jpg" />
+      <Resource Include="images\mariage.jpg" />
     </ItemGroup>
 
 </Project>
