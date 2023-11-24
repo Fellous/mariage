@@ -28,5 +28,6 @@ namespace Mariage
         }
 
         // Vous pouvez ajouter d'autres méthodes et événements ici si nécessaire
+        
     }
 }

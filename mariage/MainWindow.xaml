@@ -4,6 +4,7 @@
         Title="Planification de Mariage"
         WindowState="Maximized"
         WindowStyle="None">
+    
 
     <Window.Resources>
         <!-- Couleurs de base -->
@@ -35,6 +36,23 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        <!-- Ajoutez ce style pour centrer le contenu de la ToolBar -->
+        <Style TargetType="{x:Type ToolBar}">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+        <!-- Ajoutez ce style pour vos items de menu -->
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <!-- Autres setters pour le style -->
+        </Style>
         <ImageBrush x:Key="BackgroundImageBrush" ImageSource="file:///C:/Users/fello/OneDrive/Bureau/M1/.net/mariage/mariage/images/mariage.jpg"/>
 
     </Window.Resources>
@@ -57,6 +75,15 @@
             </BeginStoryboard>
         </EventTrigger>
     </Window.Triggers>
+    <DockPanel LastChildFill="True">
+        <!-- Barre de navigation en haut -->
+        <ToolBar DockPanel.Dock="Top" Height="Auto" HorizontalAlignment="Stretch">
+            <Button Content="Accueil" Style="{StaticResource TransparentButtonStyle}" Command="{Binding GoHomeCommand}" />
+            <Button Content="Mariages" Style="{StaticResource TransparentButtonStyle}" Command="{Binding GoToMariagesCommand}" />
+            <Button Content="Invités" Style="{StaticResource TransparentButtonStyle}" Command="{Binding GoToInvitesCommand}" />
+            <Button Content="Tables" Style="{StaticResource TransparentButtonStyle}" Command="{Binding GoToTablesCommand}" />
+            <!-- Ajoutez d'autres boutons pour les autres sections ici -->
+        </ToolBar>
 
     <!-- Contenu principal de la fenêtre -->
     
@@ -107,6 +134,50 @@
             <Button Style="{StaticResource TransparentButtonStyle}" Content="Tables" Width="200"/>
 
             <!-- Ajoutez d'autres boutons pour les autres sections ici -->
+           <!-- Contenu principal -->
+        <ScrollViewer DockPanel.Dock="Bottom">
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top">
+                
+                <!-- Titre -->
+                <TextBlock Text="Planification de Mariage"
+                           FontWeight="Bold" FontSize="36" Margin="10"
+                           HorizontalAlignment="Center" TextWrapping="Wrap"
+                           Foreground="{StaticResource PrimaryColor}"/>
+
+                <!-- Description du projet -->
+                <TextBlock Text="Bienvenue dans l'application de Planification de Mariage"
+                           FontWeight="Bold" FontSize="24" Margin="10"
+                           HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                <TextBlock Text="Cette application vous aide à gérer tous les aspects de la planification de votre mariage."
+                           Margin="5" TextWrapping="Wrap" FontSize="18"/>
+
+                <!-- Détails des onglets -->
+                <Expander Header="Mariages" IsExpanded="True" Margin="5">
+                    <TextBlock Text="Créez et gérez vos mariages, assignez des rôles et planifiez votre journée spéciale."
+                               TextWrapping="Wrap" Padding="10"/>
+                </Expander>
+                <Expander Header="Invités" Margin="5">
+                    <TextBlock Text="Suivez et gérez vos listes d'invités, de la famille aux amis."
+                               TextWrapping="Wrap" Padding="10"/>
+                </Expander>
+                <Expander Header="Tables" Margin="5">
+                    <TextBlock Text="Organisez vos tables, placez vos invités et assurez-vous que tout le monde trouve sa place."
+                               TextWrapping="Wrap" Padding="10"/>
+                </Expander>
+
+                <!-- Boutons d'action principaux -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="20">
+                    <Button Style="{StaticResource TransparentButtonStyle}" Content="Commencer la Planification" Width="250" Margin="10"/>
+                    <Button Style="{StaticResource TransparentButtonStyle}" Content="En savoir plus" Width="250" Margin="10"/>
+                </StackPanel>
+
+            </StackPanel>
+        </ScrollViewer>
         </StackPanel>
+        
     </Grid>
+        
+    </DockPanel>
+    
+    
 </Window>

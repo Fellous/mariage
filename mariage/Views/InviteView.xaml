@@ -1,12 +1,87 @@
 <UserControl x:Class="mariage.Views.InviteView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:mariage.Views"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:mariage.Models"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-        
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Section pour afficher et ajouter des invités -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
+            <TextBox Width="200" Margin="5">
+                <TextBox.Style>
+                    <Style TargetType="{x:Type TextBox}">
+                        <Setter Property="Text" Value="Nom"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="Text" Value=""/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
+            <TextBox Width="200" Margin="5">
+                <TextBox.Style>
+                    <Style TargetType="{x:Type TextBox}">
+                        <Setter Property="Text" Value="Prénom"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="Text" Value=""/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
+            <ComboBox Width="200" Margin="5" DisplayMemberPath="Value">
+                <ComboBox.ItemsSource>
+                    <x:Array Type="{x:Type local:TypeInvite}">
+                        <local:TypeInvite>FamilleMarie</local:TypeInvite>
+                        <local:TypeInvite>AmisParentsMarie</local:TypeInvite>
+                        <local:TypeInvite>AmisMarie</local:TypeInvite>
+                        <!-- Ajoutez d'autres types ici -->
+                    </x:Array>
+                </ComboBox.ItemsSource>
+            </ComboBox>
+            <TextBox Width="200" Margin="5" />
+            <Button Content="Ajouter" Margin="5" />
+        </StackPanel>
+
+
+        <!-- Liste pour afficher les invités -->
+        <ListView Grid.Row="1" Margin="5" ItemsSource="{Binding Invites}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="ID" DisplayMemberBinding="{Binding Id}" Width="50"/>
+                    <GridViewColumn Header="Nom" DisplayMemberBinding="{Binding Nom}" Width="120"/>
+                    <GridViewColumn Header="Prénom" DisplayMemberBinding="{Binding Prenom}" Width="120"/>
+                    <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="120"/>
+                    <GridViewColumn Header="ID Mariage" DisplayMemberBinding="{Binding MariageId}" Width="120"/>
+                    <GridViewColumn Header="Actions" Width="Auto">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="Modifier" Margin="5" />
+                                    <Button Content="Supprimer" Margin="5" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <!-- Section pour les actions -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Content="Sauvegarder" Margin="5" />
+            <Button Content="Annuler" Margin="5" />
+        </StackPanel>
     </Grid>
 </UserControl>
