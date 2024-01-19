@@ -2,26 +2,22 @@ using System.Windows;
 using System.Windows.Controls;
 using Mariage.ViewModels;
 
-namespace Mariage.Views;
-
-public partial class LoginView : UserControl
+namespace Mariage.Views
 {
-    public LoginView()
+    public partial class LoginView : UserControl
     {
-        InitializeComponent();
-        var viewModel = new LoginViewModel();
-
-        // Subscribe to the SuccessfulLogin event
-        viewModel.SuccessfulLogin += () =>
+        public LoginView()
         {
-            // Open the main window
-            var mainWindow = new MainWindow();
-            mainWindow.Show();
+            InitializeComponent();
+            DataContext = new LoginViewModel();
+        }
+        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (this.DataContext is LoginViewModel viewModel)
+            {
+                viewModel.Password = ((PasswordBox)sender).Password;
+            }
+        }
 
-            // Find and close the current login window
-            Window.GetWindow(this)?.Close();
-        };
-
-        this.DataContext = viewModel;
     }
 }

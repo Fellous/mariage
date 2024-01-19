@@ -2,7 +2,7 @@ using System;
 
 namespace mariage.Models;
 
-public class Mariage
+public class Mariages
 {
     public int Id { get; set; }
     public DateTime Date { get; set; }

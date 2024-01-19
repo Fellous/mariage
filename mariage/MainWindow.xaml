@@ -176,7 +176,9 @@
         </StackPanel>
         
     </Grid>
-        
+         
+        <!-- Conteneur pour le contenu dynamique -->
+        <ContentControl x:Name="ContentArea" DockPanel.Dock="Bottom"/>
     </DockPanel>
     
     
