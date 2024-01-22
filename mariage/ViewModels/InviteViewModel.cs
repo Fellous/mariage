@@ -87,23 +87,20 @@ namespace Mariage.ViewModels
             }
         }
 
-        // Créez un délégué et un événement pour la suppression
-        public delegate void DeleteInviteRequestedHandler(Invite invite);
-        public event DeleteInviteRequestedHandler DeleteInviteRequested;
-
-        private void OnDeleteInviteRequested(Invite invite)
-        {
-            DeleteInviteRequested?.Invoke(invite);
-        }
-
         private void DeleteInvite(object parameter)
         {
             if (parameter is Invite invite)
             {
-                OnDeleteInviteRequested(invite);
+                var deleteConfirmed = MessageBox.Show($"Êtes-vous sûr de vouloir supprimer l'invité : {invite.Nom} {invite.Prenom} (ID: {invite.Id}) ?", "Confirmation de suppression", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (deleteConfirmed == MessageBoxResult.Yes)
+                {
+                    PerformDeleteInvite(invite).ConfigureAwait(false);
+                }
             }
         }
-        public async Task PerformDeleteInvite(Invite invite)
+
+// Make this method private if it's only called here
+        private async Task PerformDeleteInvite(Invite invite)
         {
             using (var httpClient = new HttpClient())
             {
@@ -114,11 +111,10 @@ namespace Mariage.ViewModels
                 }
                 else
                 {
-                    // Gérez l'erreur ici
+                    MessageBox.Show("Erreur lors de la suppression de l'invité.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
-
 
     }
 }

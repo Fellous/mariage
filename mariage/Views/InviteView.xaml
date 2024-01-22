@@ -38,8 +38,8 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
-                                    <Button Content="Modifier" Margin="5" Command="{Binding UpdateInviteCommand}" CommandParameter="{Binding}" />
-                                    <Button Content="Supprimer" Margin="5" Command="{Binding DeleteInviteCommand}" CommandParameter="{Binding}" />
+                                    <Button Content="Modifier" Margin="5" Command="{Binding DataContext.UpdateInviteCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" CommandParameter="{Binding}" />
+                                    <Button Content="Supprimer" Margin="5" Command="{Binding DataContext.DeleteInviteCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" CommandParameter="{Binding}" />
                                 </StackPanel>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
