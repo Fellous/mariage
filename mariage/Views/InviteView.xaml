@@ -16,44 +16,14 @@
 
         <!-- Section pour afficher et ajouter des invités -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
-            <TextBox Width="200" Margin="5">
-                <TextBox.Style>
-                    <Style TargetType="{x:Type TextBox}">
-                        <Setter Property="Text" Value="Nom"/>
-                        <Style.Triggers>
-                            <Trigger Property="IsFocused" Value="True">
-                                <Setter Property="Text" Value=""/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBox.Style>
-            </TextBox>
-            <TextBox Width="200" Margin="5">
-                <TextBox.Style>
-                    <Style TargetType="{x:Type TextBox}">
-                        <Setter Property="Text" Value="Prénom"/>
-                        <Style.Triggers>
-                            <Trigger Property="IsFocused" Value="True">
-                                <Setter Property="Text" Value=""/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBox.Style>
-            </TextBox>
-            <ComboBox Width="200" Margin="5" DisplayMemberPath="Value">
-                <ComboBox.ItemsSource>
-                    <x:Array Type="{x:Type local:TypeInvite}">
-                        <local:TypeInvite>FamilleMarie</local:TypeInvite>
-                        <local:TypeInvite>AmisParentsMarie</local:TypeInvite>
-                        <local:TypeInvite>AmisMarie</local:TypeInvite>
-                        <!-- Ajoutez d'autres types ici -->
-                    </x:Array>
-                </ComboBox.ItemsSource>
+            <TextBox x:Name="NomTextBox" Width="200" Margin="5" />
+            <TextBox x:Name="PrenomTextBox" Width="200" Margin="5" />
+            <ComboBox x:Name="TypeComboBox" Width="200" Margin="5" DisplayMemberPath="Value" SelectedValuePath="Key">
+                <!-- ItemsSource devrait être lié à une propriété du ViewModel si nécessaire -->
             </ComboBox>
-            <TextBox Width="200" Margin="5" />
-            <Button Content="Ajouter" Margin="5" />
+            <TextBox x:Name="MariageIdTextBox" Width="200" Margin="5" />
+            <Button Content="Ajouter" Margin="5" Command="{Binding AddInviteCommand}" />
         </StackPanel>
-
 
         <!-- Liste pour afficher les invités -->
         <ListView Grid.Row="1" Margin="5" ItemsSource="{Binding Invites}">
@@ -68,8 +38,8 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
-                                    <Button Content="Modifier" Margin="5" />
-                                    <Button Content="Supprimer" Margin="5" />
+                                    <Button Content="Modifier" Margin="5" Command="{Binding UpdateInviteCommand}" CommandParameter="{Binding}" />
+                                    <Button Content="Supprimer" Margin="5" Command="{Binding DeleteInviteCommand}" CommandParameter="{Binding}" />
                                 </StackPanel>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
@@ -79,9 +49,10 @@
         </ListView>
 
         <!-- Section pour les actions -->
+        <!-- Les boutons Sauvegarder et Annuler peuvent être liés à des commandes dans le ViewModel si nécessaire -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Content="Sauvegarder" Margin="5" />
-            <Button Content="Annuler" Margin="5" />
+            <Button Content="Sauvegarder" Margin="5" Command="{Binding SaveChangesCommand}" />
+            <Button Content="Annuler" Margin="5" Command="{Binding CancelChangesCommand}" />
         </StackPanel>
     </Grid>
 </UserControl>

@@ -1,18 +1,18 @@
 using mariage.Models;
-using System;
 using System.Collections.ObjectModel;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using Mariage.Commands;
 using Newtonsoft.Json;
-
 
 namespace Mariage.ViewModels
 {
     public class InviteViewModel
     {
+        private readonly string _baseUri = "http://localhost:5191/api/";
         public ObservableCollection<Invite> Invites { get; } = new ObservableCollection<Invite>();
 
         public ICommand AddInviteCommand { get; private set; }
@@ -25,53 +25,48 @@ namespace Mariage.ViewModels
             UpdateInviteCommand = new RelayCommand(UpdateInvite, CanUpdateInvite);
             DeleteInviteCommand = new RelayCommand(DeleteInvite, CanDeleteInvite);
             
-            // Supposons que vous ayez une méthode pour charger vos invités
-            LoadInvites();
+            LoadInvites().ConfigureAwait(false);
         }
-
-       
-
-       
 
         private bool CanUpdateInvite(object parameter)
         {
-            // Vérifiez si un invité est sélectionné pour être mis à jour
             return parameter is Invite invite && Invites.Contains(invite);
         }
 
-
-
         private bool CanDeleteInvite(object parameter)
         {
-            // Vérifiez si un invité est sélectionné pour être supprimé
             return parameter is Invite invite && Invites.Contains(invite);
         }
 
         private async Task LoadInvites()
         {
-            // Utiliser HttpClient pour charger les invités depuis l'API
-            var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync("api/invites");
-            if (response.IsSuccessStatusCode)
+            using (var httpClient = new HttpClient())
             {
-                var json = await response.Content.ReadAsStringAsync();
-                var invites = JsonConvert.DeserializeObject<ObservableCollection<Invite>>(json);
-                foreach (var invite in invites)
+                var response = await httpClient.GetAsync(_baseUri + "invites");
+                if (response.IsSuccessStatusCode)
                 {
-                    Invites.Add(invite);
+                    var json = await response.Content.ReadAsStringAsync();
+                    var invites = JsonConvert.DeserializeObject<ObservableCollection<Invite>>(json);
+                    Invites.Clear();
+                    foreach (var invite in invites)
+                    {
+                        Invites.Add(invite);
+                    }
                 }
             }
         }
 
         private async void AddInvite(object parameter)
         {
-            var httpClient = new HttpClient();
-            var json = JsonConvert.SerializeObject(parameter);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await httpClient.PostAsync("api/invites", content);
-            if (response.IsSuccessStatusCode)
+            using (var httpClient = new HttpClient())
             {
-                LoadInvites(); // Recharger la liste après l'ajout
+                var json = JsonConvert.SerializeObject(parameter);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await httpClient.PostAsync(_baseUri + "invites", content);
+                if (response.IsSuccessStatusCode)
+                {
+                    await LoadInvites();
+                }
             }
         }
 
@@ -79,29 +74,51 @@ namespace Mariage.ViewModels
         {
             if (parameter is Invite invite)
             {
-                var httpClient = new HttpClient();
-                var json = JsonConvert.SerializeObject(invite);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await httpClient.PutAsync($"api/invites/{invite.Id}", content);
-                if (response.IsSuccessStatusCode)
+                using (var httpClient = new HttpClient())
                 {
-                    LoadInvites(); // Recharger la liste après la mise à jour
+                    var json = JsonConvert.SerializeObject(invite);
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+                    var response = await httpClient.PutAsync($"{_baseUri}invites/{invite.Id}", content);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        await LoadInvites();
+                    }
                 }
             }
         }
 
-        private async void DeleteInvite(object parameter)
+        // Créez un délégué et un événement pour la suppression
+        public delegate void DeleteInviteRequestedHandler(Invite invite);
+        public event DeleteInviteRequestedHandler DeleteInviteRequested;
+
+        private void OnDeleteInviteRequested(Invite invite)
+        {
+            DeleteInviteRequested?.Invoke(invite);
+        }
+
+        private void DeleteInvite(object parameter)
         {
             if (parameter is Invite invite)
             {
-                var httpClient = new HttpClient();
-                var response = await httpClient.DeleteAsync($"api/invites/{invite.Id}");
+                OnDeleteInviteRequested(invite);
+            }
+        }
+        public async Task PerformDeleteInvite(Invite invite)
+        {
+            using (var httpClient = new HttpClient())
+            {
+                var response = await httpClient.DeleteAsync($"{_baseUri}invites/{invite.Id}");
                 if (response.IsSuccessStatusCode)
                 {
-                    LoadInvites(); // Recharger la liste après la suppression
+                    await LoadInvites();
+                }
+                else
+                {
+                    // Gérez l'erreur ici
                 }
             }
         }
+
 
     }
 }
