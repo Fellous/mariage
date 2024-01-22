@@ -10,28 +10,39 @@
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/> <!-- New RowDefinition for editing section -->
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Section pour afficher et ajouter des invités -->
+        <!-- Section for displaying and adding invites -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
             <TextBox x:Name="NomTextBox" Width="200" Margin="5" />
             <TextBox x:Name="PrenomTextBox" Width="200" Margin="5" />
             <ComboBox x:Name="TypeComboBox" Width="200" Margin="5" DisplayMemberPath="Value" SelectedValuePath="Key">
-                <!-- ItemsSource devrait être lié à une propriété du ViewModel si nécessaire -->
+                <!-- ItemsSource should be bound to a property in the ViewModel if needed -->
             </ComboBox>
             <TextBox x:Name="MariageIdTextBox" Width="200" Margin="5" />
             <Button Content="Ajouter" Margin="5" Command="{Binding AddInviteCommand}" />
         </StackPanel>
 
-        <!-- Liste pour afficher les invités -->
-        <ListView Grid.Row="1" Margin="5" ItemsSource="{Binding Invites}">
+        <!-- New Section for editing selected invite -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+            <TextBox Width="200" Margin="5" Text="{Binding SelectedInvite.Nom, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox Width="200" Margin="5" Text="{Binding SelectedInvite.Prenom, UpdateSourceTrigger=PropertyChanged}" />
+
+            <!-- Add other fields for editing as necessary -->
+            <Button Content="Update" Margin="5" Command="{Binding UpdateInviteCommand}" CommandParameter="{Binding SelectedInvite}" />
+        </StackPanel>
+
+        <!-- List for displaying invites -->
+        <ListView Grid.Row="2" Margin="5" ItemsSource="{Binding Invites}" SelectedItem="{Binding SelectedInvite}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="ID" DisplayMemberBinding="{Binding Id}" Width="50"/>
                     <GridViewColumn Header="Nom" DisplayMemberBinding="{Binding Nom}" Width="120"/>
                     <GridViewColumn Header="Prénom" DisplayMemberBinding="{Binding Prenom}" Width="120"/>
+                    <!-- ...previous code... -->
                     <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="120"/>
                     <GridViewColumn Header="ID Mariage" DisplayMemberBinding="{Binding MariageId}" Width="120"/>
                     <GridViewColumn Header="Actions" Width="Auto">
@@ -48,11 +59,12 @@
             </ListView.View>
         </ListView>
 
-        <!-- Section pour les actions -->
-        <!-- Les boutons Sauvegarder et Annuler peuvent être liés à des commandes dans le ViewModel si nécessaire -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+        <!-- Section for actions -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Content="Sauvegarder" Margin="5" Command="{Binding SaveChangesCommand}" />
             <Button Content="Annuler" Margin="5" Command="{Binding CancelChangesCommand}" />
         </StackPanel>
     </Grid>
 </UserControl>
+
+                   

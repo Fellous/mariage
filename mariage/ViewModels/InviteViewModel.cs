@@ -1,5 +1,6 @@
 using mariage.Models;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace Mariage.ViewModels
 {
-    public class InviteViewModel
+    public class InviteViewModel : INotifyPropertyChanged // Implement INotifyPropertyChanged
     {
         private readonly string _baseUri = "http://localhost:5191/api/";
         public ObservableCollection<Invite> Invites { get; } = new ObservableCollection<Invite>();
@@ -26,6 +27,46 @@ namespace Mariage.ViewModels
             DeleteInviteCommand = new RelayCommand(DeleteInvite, CanDeleteInvite);
             
             LoadInvites().ConfigureAwait(false);
+        }
+        private Invite _selectedInvite;
+        public Invite SelectedInvite
+        {
+            get { return _selectedInvite; }
+            set
+            {
+                if (_selectedInvite != value)
+                {
+                    _selectedInvite = value;
+                    OnPropertyChanged(nameof(SelectedInvite)); // Notify the view of the change
+                }
+            }
+        }
+        
+
+        // Implement the interface member for INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private async void UpdateInvite(object parameter)
+        {
+            if (SelectedInvite != null && parameter is Invite updatedInvite)
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    var json = JsonConvert.SerializeObject(updatedInvite);
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+                    var response = await httpClient.PutAsync($"{_baseUri}invites/{SelectedInvite.Id}", content);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        await LoadInvites();
+                        SelectedInvite = null; // Clear selection after update
+                    }
+                }
+            }
         }
 
         private bool CanUpdateInvite(object parameter)
@@ -70,22 +111,7 @@ namespace Mariage.ViewModels
             }
         }
 
-        private async void UpdateInvite(object parameter)
-        {
-            if (parameter is Invite invite)
-            {
-                using (var httpClient = new HttpClient())
-                {
-                    var json = JsonConvert.SerializeObject(invite);
-                    var content = new StringContent(json, Encoding.UTF8, "application/json");
-                    var response = await httpClient.PutAsync($"{_baseUri}invites/{invite.Id}", content);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        await LoadInvites();
-                    }
-                }
-            }
-        }
+      
 
         private void DeleteInvite(object parameter)
         {
