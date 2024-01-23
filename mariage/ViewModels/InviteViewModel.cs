@@ -1,3 +1,4 @@
+using System;
 using mariage.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -13,21 +14,23 @@ namespace Mariage.ViewModels
 {
     public class InviteViewModel : INotifyPropertyChanged // Implement INotifyPropertyChanged
     {
-        private readonly string _baseUri = "http://localhost:5191/api/";
+       private readonly string _baseUri = "http://localhost:5191/api/";
         public ObservableCollection<Invite> Invites { get; } = new ObservableCollection<Invite>();
+        
+        public Invite NewInvite { get; set; }
 
         public ICommand AddInviteCommand { get; private set; }
-        public ICommand UpdateInviteCommand { get; private set; }
+        public ICommand BeginEditInviteCommand { get; private set; }
+        public ICommand CommitUpdateInviteCommand { get; private set; }
         public ICommand DeleteInviteCommand { get; private set; }
+        // Implement the interface member for INotifyPropertyChanged
+        
 
-        public InviteViewModel()
+        protected virtual void OnPropertyChanged(string propertyName)
         {
-            AddInviteCommand = new RelayCommand(AddInvite);
-            UpdateInviteCommand = new RelayCommand(UpdateInvite, CanUpdateInvite);
-            DeleteInviteCommand = new RelayCommand(DeleteInvite, CanDeleteInvite);
-            
-            LoadInvites().ConfigureAwait(false);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
         private Invite _selectedInvite;
         public Invite SelectedInvite
         {
@@ -37,27 +40,85 @@ namespace Mariage.ViewModels
                 if (_selectedInvite != value)
                 {
                     _selectedInvite = value;
-                    OnPropertyChanged(nameof(SelectedInvite)); // Notify the view of the change
+                    OnPropertyChanged(nameof(SelectedInvite));
                 }
             }
         }
-        
 
-        // Implement the interface member for INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged(string propertyName)
+        public InviteViewModel()
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+            NewInvite = new Invite();
+            AddInviteCommand = new RelayCommand(AddInviteExecute, AddInviteCanExecute);
 
-        private async void UpdateInvite(object parameter)
+            BeginEditInviteCommand = new RelayCommand(BeginEditInvite);
+            CommitUpdateInviteCommand = new RelayCommand(CommitUpdateInvite, CanUpdateInvite);
+            DeleteInviteCommand = new RelayCommand(DeleteInvite, CanDeleteInvite);
+
+            LoadInvites().ConfigureAwait(false);
+        }
+        private async void AddInviteExecute(object parameter)
         {
-            if (SelectedInvite != null && parameter is Invite updatedInvite)
+            if (NewInvite != null)
             {
                 using (var httpClient = new HttpClient())
                 {
-                    var json = JsonConvert.SerializeObject(updatedInvite);
+                    // Configurez httpClient si nécessaire, par exemple en ajoutant des en-têtes
+                    // httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "votre_token");
+
+                    var json = JsonConvert.SerializeObject(NewInvite);
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                    try
+                    {
+                        var response = await httpClient.PostAsync(_baseUri + "invites", content);
+                        if (response.IsSuccessStatusCode)
+                        {
+                            // Si l'ajout est réussi, rechargez la liste des invités
+                            await LoadInvites();
+                            // Vous pouvez également effacer NewInvite ou notifier l'utilisateur de la réussite
+                            NewInvite = new Invite(); // Réinitialiser pour le prochain ajout
+                            OnPropertyChanged(nameof(NewInvite));
+                        }
+                        else
+                        {
+                            // Gérez ici les réponses d'erreur, comme l'affichage d'un message à l'utilisateur
+                            var errorContent = await response.Content.ReadAsStringAsync();
+                            MessageBox.Show($"Erreur lors de l'ajout de l'invité: {errorContent}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Gérez ici les exceptions, comme l'affichage d'un message à l'utilisateur
+                        MessageBox.Show($"Erreur lors de la connexion à l'API: {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+        }
+
+
+        private bool AddInviteCanExecute(object parameter)
+        {
+            // Valider les informations de NewInvite avant d'autoriser l'ajout
+            return !string.IsNullOrEmpty(NewInvite.Nom) && !string.IsNullOrEmpty(NewInvite.Prenom) && NewInvite.MariageId > 0;
+        }
+
+        private void BeginEditInvite(object parameter)
+        {
+            if (parameter is Invite invite)
+            {
+                SelectedInvite = invite; // Set the selected invite for editing
+            }
+        }
+
+        private async void CommitUpdateInvite(object parameter)
+        {
+            if (SelectedInvite != null)
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    var json = JsonConvert.SerializeObject(SelectedInvite);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
                     var response = await httpClient.PutAsync($"{_baseUri}invites/{SelectedInvite.Id}", content);
                     if (response.IsSuccessStatusCode)
@@ -69,8 +130,10 @@ namespace Mariage.ViewModels
             }
         }
 
+
         private bool CanUpdateInvite(object parameter)
         {
+            // Check if the parameter is an Invite and it exists in the Invites collection
             return parameter is Invite invite && Invites.Contains(invite);
         }
 

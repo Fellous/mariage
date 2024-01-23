@@ -16,23 +16,35 @@
         </Grid.RowDefinitions>
 
         <!-- Section for displaying and adding invites -->
+        <!-- Section pour afficher et ajouter des invités -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
-            <TextBox x:Name="NomTextBox" Width="200" Margin="5" />
-            <TextBox x:Name="PrenomTextBox" Width="200" Margin="5" />
-            <ComboBox x:Name="TypeComboBox" Width="200" Margin="5" DisplayMemberPath="Value" SelectedValuePath="Key">
-                <!-- ItemsSource should be bound to a property in the ViewModel if needed -->
+            <TextBox x:Name="NomTextBox" Width="100" Margin="5"  Text="{Binding NewInvite.Nom, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox x:Name="PrenomTextBox" Width="100" Margin="5"  Text="{Binding NewInvite.Prenom, UpdateSourceTrigger=PropertyChanged}" />
+            <ComboBox x:Name="TypeComboBox" Width="200" Margin="5" SelectedItem="{Binding NewInvite.Type, UpdateSourceTrigger=PropertyChanged}">
+                <ComboBoxItem Content="FamilleMarie"/>
+                <ComboBoxItem Content="AmisParentsMarie"/>
+                <ComboBoxItem Content="AmisMarie"/>
+                <ComboBoxItem Content="FamilleMariee"/>
+                <ComboBoxItem Content="AmisParentsMariee"/>
+                <ComboBoxItem Content="AmisMariee"/>
             </ComboBox>
-            <TextBox x:Name="MariageIdTextBox" Width="200" Margin="5" />
+            <TextBox x:Name="MariageIdTextBox" Width="100" Margin="5"  Text="{Binding NewInvite.MariageId, UpdateSourceTrigger=PropertyChanged}" />
             <Button Content="Ajouter" Margin="5" Command="{Binding AddInviteCommand}" />
         </StackPanel>
 
+      
+
         <!-- New Section for editing selected invite -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
-            <TextBox Width="200" Margin="5" Text="{Binding SelectedInvite.Nom, UpdateSourceTrigger=PropertyChanged}" />
-            <TextBox Width="200" Margin="5" Text="{Binding SelectedInvite.Prenom, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBox Width="200" Margin="5" Text="{Binding SelectedInvite.Nom, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+            <TextBox Width="200" Margin="5" Text="{Binding SelectedInvite.Prenom, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
 
             <!-- Add other fields for editing as necessary -->
-            <Button Content="Update" Margin="5" Command="{Binding UpdateInviteCommand}" CommandParameter="{Binding SelectedInvite}" />
+            <!-- Button to commit the edit -->
+            <Button Content="Update" Margin="5" 
+                    Command="{Binding CommitUpdateInviteCommand}" 
+                    CommandParameter="{Binding SelectedInvite}" />
         </StackPanel>
 
         <!-- List for displaying invites -->
@@ -49,8 +61,9 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
-                                    <Button Content="Modifier" Margin="5" Command="{Binding DataContext.UpdateInviteCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" CommandParameter="{Binding}" />
-                                    <Button Content="Supprimer" Margin="5" Command="{Binding DataContext.DeleteInviteCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" CommandParameter="{Binding}" />
+                                    <Button Content="Modifier" Margin="5" 
+                                            Command="{Binding BeginEditInviteCommand}" 
+                                            CommandParameter="{Binding}" />                                    <Button Content="Supprimer" Margin="5" Command="{Binding DataContext.DeleteInviteCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" CommandParameter="{Binding}" />
                                 </StackPanel>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
