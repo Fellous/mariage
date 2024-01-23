@@ -1,41 +1,46 @@
 using mariage.Models;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using Mariage.Commands;
 using Newtonsoft.Json;
-using System;
 
 namespace Mariage.ViewModels
 {
-    public class MariageViewModel
+    public class MariageViewModel : INotifyPropertyChanged
     {
-        private readonly string _baseUri = "http://localhost:5191/api/"; // Remplacez par l'URL de votre API
+        private readonly string _baseUri = "http://localhost:5191/api/";
         public ObservableCollection<Mariages> Mariages { get; } = new ObservableCollection<Mariages>();
 
         public ICommand AddMariageCommand { get; private set; }
         public ICommand UpdateMariageCommand { get; private set; }
         public ICommand DeleteMariageCommand { get; private set; }
 
+        private Mariages _selectedMariage;
+        public Mariages SelectedMariage
+        {
+            get { return _selectedMariage; }
+            set
+            {
+                if (_selectedMariage != value)
+                {
+                    _selectedMariage = value;
+                    OnPropertyChanged(nameof(SelectedMariage));
+                }
+            }
+        }
+
         public MariageViewModel()
         {
             AddMariageCommand = new RelayCommand(AddMariage);
-            UpdateMariageCommand = new RelayCommand(UpdateMariage, CanUpdateMariage);
-            DeleteMariageCommand = new RelayCommand(DeleteMariage, CanDeleteMariage);
+            UpdateMariageCommand = new RelayCommand(UpdateMariage, CanExecuteMariageCommand);
+            DeleteMariageCommand = new RelayCommand(DeleteMariage, CanExecuteMariageCommand);
 
             LoadMariages().ConfigureAwait(false);
-        }
-
-        private bool CanUpdateMariage(object parameter)
-        {
-            return parameter is Mariages mariage && Mariages.Contains(mariage);
-        }
-
-        private bool CanDeleteMariage(object parameter)
-        {
-            return parameter is Mariages mariage && Mariages.Contains(mariage);
         }
 
         private async Task LoadMariages()
@@ -58,21 +63,26 @@ namespace Mariage.ViewModels
 
         private async void AddMariage(object parameter)
         {
-            using (var httpClient = new HttpClient())
+            var mariage = parameter as Mariages;
+            if (mariage != null)
             {
-                var json = JsonConvert.SerializeObject(parameter);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await httpClient.PostAsync(_baseUri + "mariages", content);
-                if (response.IsSuccessStatusCode)
+                using (var httpClient = new HttpClient())
                 {
-                    await LoadMariages();
+                    var json = JsonConvert.SerializeObject(mariage);
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+                    var response = await httpClient.PostAsync(_baseUri + "mariages", content);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        await LoadMariages();
+                    }
                 }
             }
         }
 
         private async void UpdateMariage(object parameter)
         {
-            if (parameter is Mariages mariage)
+            var mariage = parameter as Mariages;
+            if (mariage != null && mariage == SelectedMariage)
             {
                 using (var httpClient = new HttpClient())
                 {
@@ -89,17 +99,34 @@ namespace Mariage.ViewModels
 
         private async void DeleteMariage(object parameter)
         {
-            if (parameter is Mariages mariage)
+            var mariage = parameter as Mariages;
+            if (mariage != null && mariage == SelectedMariage)
             {
-                using (var httpClient = new HttpClient())
+                var deleteConfirmed = MessageBox.Show($"Êtes-vous sûr de vouloir supprimer le mariage : {mariage.Date} ?", "Confirmation de suppression", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (deleteConfirmed == MessageBoxResult.Yes)
                 {
-                    var response = await httpClient.DeleteAsync($"{_baseUri}mariages/{mariage.Id}");
-                    if (response.IsSuccessStatusCode)
+                    using (var httpClient = new HttpClient())
                     {
-                        await LoadMariages();
+                        var response = await httpClient.DeleteAsync($"{_baseUri}mariages/{mariage.Id}");
+                        if (response.IsSuccessStatusCode)
+                        {
+                            await LoadMariages();
+                        }
                     }
                 }
             }
+        }
+
+        private bool CanExecuteMariageCommand(object parameter)
+        {
+            return SelectedMariage != null;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

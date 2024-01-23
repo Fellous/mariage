@@ -8,6 +8,6 @@ public partial class MariageView : UserControl
     public MariageView()
     {
         InitializeComponent();
-        DataContext = new MariageViewModel();
+        this.DataContext = new MariageViewModel();
     }
 }
