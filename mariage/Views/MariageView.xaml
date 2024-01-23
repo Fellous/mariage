@@ -3,26 +3,49 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:local="clr-namespace:Mariage.ViewModels"
+             xmlns:local="clr-namespace:mariage.Models"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-        <DataGrid ItemsSource="{Binding Mariages}" AutoGenerateColumns="False" CanUserAddRows="False">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="ID" Binding="{Binding Id}" />
-                <DataGridTextColumn Header="Nom du mariage" Binding="{Binding Nom}" />
-                <DataGridTextColumn Header="Date" Binding="{Binding DateMariage}" />
-                <DataGridTemplateColumn Header="Actions">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <Button Content="Modifier" Command="{Binding DataContext.EditMariageCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" CommandParameter="{Binding}"/>
-                                <Button Content="Supprimer" Command="{Binding DataContext.DeleteMariageCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" CommandParameter="{Binding}"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Section pour afficher et ajouter des mariages -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
+            <DatePicker x:Name="DateDatePicker" Margin="5"/>
+            <TextBox x:Name="ThemeTableTextBox" Width="200" Margin="5" />
+            <Button Content="Ajouter" Margin="5" Command="{Binding AddMariageCommand}" />
+        </StackPanel>
+
+        <!-- Liste pour afficher les mariages -->
+        <ListView Grid.Row="1" Margin="5" ItemsSource="{Binding Mariages}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="ID" DisplayMemberBinding="{Binding Id}" Width="50"/>
+                    <GridViewColumn Header="Date" DisplayMemberBinding="{Binding Date}" Width="120"/>
+                    <GridViewColumn Header="Thème de Table" DisplayMemberBinding="{Binding ThemeTable}" Width="120"/>
+                    <GridViewColumn Header="Actions" Width="Auto">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="Modifier" Margin="5" Command="{Binding UpdateMariageCommand}" CommandParameter="{Binding}" />
+                                    <Button Content="Supprimer" Margin="5" Command="{Binding DeleteMariageCommand}" CommandParameter="{Binding}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <!-- Section pour les actions -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Content="Enregistrer" Margin="5" Command="{Binding SaveChangesCommand}" />
+            <Button Content="Annuler" Margin="5" Command="{Binding CancelChangesCommand}" />
+        </StackPanel>
     </Grid>
 </UserControl>
